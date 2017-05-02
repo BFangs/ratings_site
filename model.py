@@ -26,11 +26,11 @@ class User(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<User user_id=%s email=%s password=%s age=%d, zipcode=%s>" %(self.user_id,
-                                                                             self.email,
-                                                                             self.password,
-                                                                             self.age,
-                                                                             self.zipcode)
+        return "<User user_id=%s email=%s password=%s age=%d, zipcode=%s>" % (self.user_id,
+                                                                              self.email,
+                                                                              self.password,
+                                                                              self.age,
+                                                                              self.zipcode)
 
 # Put your Movie and Rating model classes here.
 
@@ -41,9 +41,9 @@ class Movie(db.Model):
     __tablename__ = "movie"
 
     movie_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    title = db.Column(db.String(64), nullable=True)
+    title = db.Column(db.String(500), nullable=True)
     released_at = db.Column(db.DateTime, nullable=True)
-    imdb_url = db.Column(db.String(128), nullable=True)
+    imdb_url = db.Column(db.String(500), nullable=True)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -74,6 +74,7 @@ class Rating(db.Model):
 
 ##############################################################################
 # Helper functions
+
 
 def connect_to_db(app):
     """Connect the database to our Flask app."""
