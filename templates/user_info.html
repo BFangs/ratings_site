@@ -6,7 +6,7 @@
     <ul>
       {% for rating in user.ratings %}
           <li>
-              {{ rating.movie.title }} {{ rating.score }}
+              <a href="/movies/{{ rating.movie_id }}">{{ rating.movie.title }} {{ rating.score }}</a>
           </li>
       {% endfor %}
     </ul>

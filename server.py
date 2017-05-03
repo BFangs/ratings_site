@@ -27,30 +27,49 @@ def index():
     return render_template("homepage.html")
 
 
+@app.route("/movies")
+def movie_list():
+    """Show list of movie titles."""
+
+    movies = Movie.query.all()
+    return render_template("movie_list.html", movies=movies)
+
+
+@app.route("/movies/<movie_id>")
+def movie_info(movie_id):
+    """Show movie and the ratings for that movie."""
+
+    movie = Movie.query.filter_by(movie_id=movie_id).one()
+    return render_template("movie_info.html", movie=movie)
+
+
 @app.route("/users")
 def user_list():
     """Show list of users."""
 
-    users = User.query.all()
+    users = User.query.order_by('user_id').all()
     return render_template("user_list.html", users=users)
 
 
 @app.route("/users/<user_id>")
 def user_info(user_id):
-    """Show list of users."""
+    """Show details about a user and movies they've reviewed."""
 
     person = User.query.filter_by(user_id=user_id).one()
     return render_template("user_info.html",
-                            user=person)
+                           user=person)
+
 
 @app.route("/register")
 def register_form():
+    """Registration form for ratings site."""
 
     return render_template("register_form.html")
 
 
 @app.route("/register", methods=['POST'])
 def register_process():
+    """Accept or reject email address and password by checking if user exists."""
 
     username = request.form.get('username')
     password = request.form.get('password')
@@ -63,14 +82,16 @@ def register_process():
 
     return redirect("/")
 
+
 @app.route("/login")
 def login():
-
+    """Display login form for already registered users."""
     return render_template("login_form.html")
 
 
 @app.route("/login", methods=['POST'])
 def login_process():
+    """Check that email and password match or if email exists."""
 
     username = request.form.get('username')
     password = request.form.get('password')
@@ -79,6 +100,7 @@ def login_process():
         if user.password == password:
             session["user_id"] = user.user_id
             flash("You're now logged in! Congrats!")
+            return redirect("/users/%s" % (user.user_id))
         else:
             flash("That was the wrong password dum dum!!")
             return redirect("/login")
@@ -86,10 +108,12 @@ def login_process():
         flash("You haven't made an account yet! Register now!")
         return redirect("/register")
 
-    return redirect("/")
+    
+
 
 @app.route("/loggout")
 def loggout():
+    """Link to delete user session/log user out of ratings site."""
     del session["user_id"]
     flash("You're now logged out")
     return redirect("/")
