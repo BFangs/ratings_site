@@ -35,15 +35,63 @@ def user_list():
     return render_template("user_list.html", users=users)
 
 
+@app.route("/users/<user_id>")
+def user_info(user_id):
+    """Show list of users."""
+
+    person = User.query.filter_by(user_id=user_id).one()
+    return render_template("user_info.html",
+                            user=person)
+
 @app.route("/register")
 def register_form():
 
     return render_template("register_form.html")
 
 
-@app.route("/register")
+@app.route("/register", methods=['POST'])
 def register_process():
 
+    username = request.form.get('username')
+    password = request.form.get('password')
+    if User.query.filter_by(email=username).all():
+        flash("You've already made an account dum dum!")
+    else:
+        user = User(email=username, password=password)
+        db.session.add(user)
+        db.session.commit()
+
+    return redirect("/")
+
+@app.route("/login")
+def login():
+
+    return render_template("login_form.html")
+
+
+@app.route("/login", methods=['POST'])
+def login_process():
+
+    username = request.form.get('username')
+    password = request.form.get('password')
+    if User.query.filter_by(email=username).all():
+        user = User.query.filter_by(email=username).one()
+        if user.password == password:
+            session["user_id"] = user.user_id
+            flash("You're now logged in! Congrats!")
+        else:
+            flash("That was the wrong password dum dum!!")
+            return redirect("/login")
+    else:
+        flash("You haven't made an account yet! Register now!")
+        return redirect("/register")
+
+    return redirect("/")
+
+@app.route("/loggout")
+def loggout():
+    del session["user_id"]
+    flash("You're now logged out")
     return redirect("/")
 
 if __name__ == "__main__":
