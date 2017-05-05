@@ -3,6 +3,24 @@
 
     <h2>Movie detail</h2>
     <p>{{ movie.title }} {{ movie.released_at }} {{ movie.imdb_url }}</p>
+    <p>Average rating: {{ average }}</p>
+    {% if prediction %}
+    <p>We predict you will rate this movie {{ prediction }}.</p>
+    {% endif %}
+    <div id='rating_form_div'>
+    <form action='/rate' method='POST' id='rate_form'>
+    <p>Enter Your Rating:</p>
+    <select name='rate' id='rate'>
+        <option value="1">1 (Worst)</option>
+        <option value="2">2</option>
+        <option value="3">3 (Meh)</option>
+        <option value="4">4</option>
+        <option value="5">5 (Best)</option>
+    </select>
+    <input type="hidden" value="{{ movie.movie_id }}" name='movie_id'>
+    <input type='submit' id='submit_rating'>
+    </form>
+    </div>
     <ul>
       {% for rating in movie.ratings %}
           <li>
@@ -11,4 +29,7 @@
       {% endfor %}
     </ul>
 
+<script src="https://code.jquery.com/jquery.js"></script>
+<script>
+</script>
 {% endblock %}

@@ -57,7 +57,7 @@ class User(db.Model):
         similarities.sort(reverse=True)
         similarities = [(sim, r) for sim, r in similarities if sim > 0]
         if not similarities:
-                return None
+            return None
         numerator = sum([r.score * sim for sim, r in similarities])
         denominator = sum([sim for sim, r in similarities])
 
@@ -106,6 +106,16 @@ class Rating(db.Model):
 
     user = db.relationship("User", backref="ratings", order_by=rating_id)
     movie = db.relationship("Movie", backref="ratings", order_by=rating_id)
+
+    @classmethod
+    def new_rating(cls, movie_id, user_id, score):
+        """insert new rating"""
+        rating = Rating(movie_id=movie_id,
+                        user_id=user_id,
+                        score=score)
+        db.session.add(rating)
+        db.session.commit()
+
 
     def __repr__(self):
         """Provide helpful representation when printed."""

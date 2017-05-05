@@ -1,12 +1,43 @@
 {% extends 'base.html' %}
 {% block content %}
 <p>Register Here!!</p>
-<form action='/register' method='POST'>
+<form action='/register' method='POST' id='reg_form'>
   <p>enter an email</p>
   <input type='text' id='username' name='username'>
   <p>enter a password</p>
   <input type='password' id='password' name='password'>
   <input type='submit' id='register'>
 </form>
+
+<script src="https://code.jquery.com/jquery.js"></script>
+<script>
+// "use strict";
+
+// function validate(evt) {
+//     evt.preventDefault();
+//     var username = $('#username').val();
+//     var password = $('#password').val();
+//     var formInput = {"username": username, "password": password};
+//     $.post("/register", formInput, redirectFunction);
+// }
+// function redirectFunction(results) {
+
+//     if results {
+//         var email = results.username;
+//         var password = results.password;
+//         if password{
+//             $.post("/login", formInput, redirectFunction);
+//         }
+
+//     }
+        
+
+// }
+
+
+// $('#reg_form').on('submit', validate);
+
+
+</script>
 
 {% endblock %}

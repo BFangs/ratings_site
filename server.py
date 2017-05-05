@@ -35,12 +35,60 @@ def movie_list():
     return render_template("movie_list.html", movies=movies)
 
 
-@app.route("/movies/<movie_id>")
+@app.route("/movies/<movie_id>", methods=['GET'])
 def movie_info(movie_id):
     """Show movie and the ratings for that movie."""
 
-    movie = Movie.query.filter_by(movie_id=movie_id).one()
-    return render_template("movie_info.html", movie=movie)
+    movie = Movie.query.get(movie_id)
+
+    user_id = session.get("user_id")
+
+    if user_id:
+        user_rating = Rating.query.filter_by(
+            movie_id=movie_id, user_id=user_id).first()
+
+    else:
+        user_rating = None
+
+    # Get average rating of movie
+
+    rating_scores = [r.score for r in movie.ratings]
+    avg_rating = float(sum(rating_scores)) / len(rating_scores)
+
+    prediction = None
+
+    # Prediction code: only predict if the user hasn't rated it.
+
+    if (not user_rating) and user_id:
+        user = User.query.get(user_id)
+        if user:
+            prediction = user.predict_rating(movie)
+
+    return render_template(
+        "movie_info.html",
+        movie=movie,
+        user_rating=user_rating,
+        average=avg_rating,
+        prediction=prediction
+        )
+
+
+@app.route("/rate", methods=['POST'])
+def rate_movie():
+    """Insert ratings for that one movie."""
+
+    rating = int(request.form.get("rate"))
+    movie = request.form.get("movie_id")
+    user_id = session["user_id"]
+    try:
+        old_rating = Rating.query.filter_by(movie_id=movie, user_id=user_id).one()
+        old_rating.score = rating
+        db.session.commit()
+        flash("You've already rated it! I've gone ahead and updated your rating dum dum")
+    except:
+        Rating.new_rating(movie, user_id, rating)
+        flash("You've made a new rating!")
+    return redirect("/users/%s" % (user_id))
 
 
 @app.route("/users")
@@ -75,12 +123,18 @@ def register_process():
     password = request.form.get('password')
     if User.query.filter_by(email=username).all():
         flash("You've already made an account dum dum!")
+        return redirect("/login")
+        # if User.query.filter_by(password=password).all():
+        #     response = {'username': username, 'password': password}
+        #     return jsonify(response)
+        # else:
+        #     response = {'username': username}
+        #     return jsonify(response)
     else:
         user = User(email=username, password=password)
         db.session.add(user)
         db.session.commit()
-
-    return redirect("/")
+        return redirect("/login")
 
 
 @app.route("/login")
@@ -107,8 +161,6 @@ def login_process():
     else:
         flash("You haven't made an account yet! Register now!")
         return redirect("/register")
-
-    
 
 
 @app.route("/loggout")
